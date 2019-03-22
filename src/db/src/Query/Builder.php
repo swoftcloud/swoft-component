@@ -2242,6 +2242,7 @@ class Builder implements PrototypeInterface
      */
     public function toSql(): string
     {
+        $this->connection->release();
         return $this->grammar->compileSelect($this);
     }
 

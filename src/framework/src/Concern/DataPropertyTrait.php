@@ -45,6 +45,28 @@ trait DataPropertyTrait
     }
 
     /**
+     * Check if an item exists in an array using "dot" notation.
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
+    public function has(string $key): bool
+    {
+        return ArrayHelper::has($this->data, $key);
+    }
+
+    /**
+     * Unset key
+     *
+     * @param string  $key
+     */
+    public function unset(string $key): void
+    {
+        unset($this->data[$key]);
+    }
+
+    /**
      * Set multi value to context
      *
      * @param array $map

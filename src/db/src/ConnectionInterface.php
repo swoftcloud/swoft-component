@@ -161,23 +161,16 @@ interface ConnectionInterface
     /**
      * Rollback the active database transaction.
      *
+     * @param int $toLevel
+     *
      * @return void
      */
-    public function rollBack(): void;
+    public function rollBack(int $toLevel = null): void;
 
     /**
      * Get the number of active transactions.
      *
      * @return int
      */
-    public function transactionLevel(): void;
-
-    /**
-     * Execute the given callback in "dry run" mode.
-     *
-     * @param  \Closure $callback
-     *
-     * @return array
-     */
-    public function pretend(\Closure $callback): array;
+    public function transactionLevel(): int;
 }

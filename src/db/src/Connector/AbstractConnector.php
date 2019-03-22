@@ -39,6 +39,7 @@ abstract class AbstractConnector implements ConnectorInterface
     public function createConnection($dsn, string $username, string $password, array $options)
     {
         $options = $this->getOptions($options);
+
         return new \PDO($dsn, $username, $password, $options);
     }
 

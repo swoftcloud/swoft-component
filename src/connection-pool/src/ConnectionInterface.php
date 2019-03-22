@@ -23,14 +23,16 @@ interface ConnectionInterface
     /**
      * Get connection unique id
      *
-     * @return string
+     * @return int
      */
-    public function getId(): string;
+    public function getId(): int;
 
     /**
      * Release connection
+     *
+     * @param bool $force
      */
-    public function release(): void;
+    public function release(bool $force = false): void;
 
     /**
      * Get last time
@@ -39,5 +41,10 @@ interface ConnectionInterface
      */
     public function getLastTime(): int;
 
-
+    /**
+     * Set whether to release
+     *
+     * @param bool $release
+     */
+    public function setRelease(bool $release): void;
 }

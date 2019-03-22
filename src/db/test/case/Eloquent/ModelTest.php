@@ -18,8 +18,8 @@ class ModelTest extends TestCase
     /**
      * Save
      */
-    public function testSave()
-    {
+//    public function testSave()
+//    {
 //        go(function () {
 //            $user = User::new();
 //            $user->setAge(100);
@@ -39,15 +39,16 @@ class ModelTest extends TestCase
 //            $result2 = $user2->save();
 //            $this->assertTrue($result2);
 //        });
-    }
+//    }
 
-    public function testFind()
-    {
-        /* @var User $result*/
-        $result = User::whereIn('id', [22,23])->first();
-        
-        var_dump($result->makeVisible(['age'])->toArray());
-
-//        var_dump(User::where('age', '=', 100)->select('id')->selectSub());
-    }
+//    public function testFind()
+//    {
+//        go(function () {
+//            /* @var User $result */
+//            $result = User::find(22);
+//
+//            var_dump($result->makeVisible(['age'])->toArray());
+//            $this->assertTrue(true);
+//        });
+//    }
 }

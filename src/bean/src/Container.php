@@ -291,14 +291,6 @@ class Container implements ContainerInterface
         $this->initializeBeans();
     }
 
-    public function initializeRequest(int $rid): void
-    {
-        // /* @var ObjectDefinition $objectDefinition */
-        // foreach ($this->requestDefinitions as $beanName => $objectDefinition) {
-        // TODO ...
-        // }
-    }
-
     /**
      * Get request bean
      *

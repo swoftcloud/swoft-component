@@ -3,6 +3,7 @@
 namespace Swoft\Http\Server;
 
 use Swoft\Bean\Annotation\Mapping\Bean;
+use Swoft\Bean\BeanFactory;
 use Swoft\Bean\Container;
 use Swoft\Context\ContextInterface;
 use Swoft\Concern\DataPropertyTrait;

@@ -43,7 +43,7 @@ final class BeanFactory
      * @param string $name
      * @param int    $id
      *
-     * @return object
+     * @return object|mixed
      * @throws ContainerException
      * @throws \ReflectionException
      */

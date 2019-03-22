@@ -3,6 +3,8 @@
 
 namespace Swoft\Connection\Pool;
 
+use Swoft\Bean\BeanFactory;
+
 /**
  * Class AbstractConnection
  *
@@ -10,14 +12,70 @@ namespace Swoft\Connection\Pool;
  */
 abstract class AbstractConnection implements ConnectionInterface
 {
-    public function getId(): string
+    /**
+     * @var PoolInterface
+     */
+    protected $pool;
+
+    /**
+     * Whether to release connection
+     *
+     * @var bool
+     */
+    protected $release = false;
+
+    /**
+     * Connection id(Inc from 0)
+     *
+     * @var int
+     */
+    protected $id = 0;
+
+    /**
+     * Init connection
+     *
+     * @param PoolInterface $pool
+     *
+     * @throws \ReflectionException
+     * @throws \Swoft\Bean\Exception\ContainerException
+     */
+    public function initConnection(PoolInterface $pool): void
     {
-        // TODO: Implement getId() method.
+        $this->pool = $pool;
+
+        /* @var PoolManager $poolManager */
+        $poolManager = BeanFactory::getBean(PoolManager::class);
+
+        // Init connection id
+        $this->id = $poolManager->getConnectionId();
     }
 
-    public function release(): void
+    /**
+     * @return int
+     */
+    public function getId(): int
     {
-        // TODO: Implement release() method.
+        return $this->id;
     }
 
+    /**
+     * @param bool $release
+     */
+    public function setRelease(bool $release): void
+    {
+        $this->release = $release;
+    }
+
+    /**
+     * Release Connection
+     *
+     * @param bool $force
+     */
+    public function release(bool $force = false): void
+    {
+        if ($this->release) {
+            $this->release = false;
+            $this->pool->release($this);
+        }
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace Swoft\Context;
 
+use Swoft\Bean\BeanFactory;
 use Swoft\Co;
 use Swoft\Exception\ContextException;
 use Swoft\Http\Server\HttpContext;
@@ -66,6 +67,21 @@ class Context
         $tid = Co::tid();
 
         self::$context[$tid] = $context;
+    }
+
+    /**
+     * Get request bean
+     * 
+     * @param string $name
+     *
+     * @return mixed|object
+     * @throws \ReflectionException
+     * @throws \Swoft\Bean\Exception\ContainerException
+     */
+    public static function getRequestBean(string $name)
+    {
+        $tid = Co::tid();
+        return BeanFactory::getRequestBean($name, $tid);
     }
 
     /**

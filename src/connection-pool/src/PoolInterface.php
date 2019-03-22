@@ -30,4 +30,9 @@ interface PoolInterface
      * @param ConnectionInterface $connection
      */
     public function release(ConnectionInterface $connection): void;
+
+    /**
+     * Remove connection
+     */
+    public function remove(): void;
 }

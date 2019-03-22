@@ -17,11 +17,11 @@ namespace Swoft\Event\Listener;
  */
 class ListenerPriority
 {
-    public const MIN          = -300;
+    public const MIN          = PHP_INT_MIN;
     public const LOW          = -200;
     public const BELOW_NORMAL = -100;
     public const NORMAL       = 0;
     public const ABOVE_NORMAL = 100;
     public const HIGH         = 200;
-    public const MAX          = 300;
+    public const MAX          = PHP_INT_MAX;
 }

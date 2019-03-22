@@ -11,13 +11,14 @@ use Swoft\Event\EventInterface;
 use Swoft\Http\Message\Response;
 use Swoft\Http\Server\HttpServerEvent;
 use Swoft\Log\Logger;
+use Swoft\Event\Listener\ListenerPriority;
 
 /**
  * Class AfterRequestListener
  *
  * @since 2.0
  *
- * @Listener(HttpServerEvent::AFTER_REQUEST)
+ * @Listener(event=HttpServerEvent::AFTER_REQUEST, priority=ListenerPriority::MIN)
  */
 class AfterRequestListener implements EventHandlerInterface
 {
