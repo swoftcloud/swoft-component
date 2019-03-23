@@ -56,7 +56,7 @@ class HttpDispatcher extends Dispatcher
             $response = $requestHandler->handle($request);
         } catch (\Throwable $e) {
             \printf(
-                "HTTP Dispatch Error: %s\nAt %s %d",
+                Co::tid(). "HTTP Dispatch Error: %s\nAt %s %d",
                 $e->getMessage(),
                 $e->getFile(),
                 $e->getLine()
@@ -65,9 +65,6 @@ class HttpDispatcher extends Dispatcher
 
         // Trigger after request
         \Swoft::trigger(HttpServerEvent::AFTER_REQUEST, $this, $response);
-
-        // Trigger destroy request bean
-        \Swoft::trigger(BeanEvent::DESTROY_REQUEST, $this, Co::tid());
         // $response->withContent('<h1>Hello Swoole</h1>')->send();
     }
 

@@ -27,7 +27,7 @@ class Container implements ContainerInterface
     /**
      * Destroy method before destroy bean
      */
-    public const DESTROY_METHOD = 'destroy';
+    public const DESTROY_METHOD = '__destroy';
 
     /**
      * Default pool size
@@ -387,7 +387,9 @@ class Container implements ContainerInterface
 
     /**
      * Quick get exist singleton
+     *
      * @param string $name
+     *
      * @return mixed
      */
     public function getSingleton(string $name)
@@ -412,6 +414,7 @@ class Container implements ContainerInterface
 
     /**
      * @param string $name
+     *
      * @return mixed|null
      */
     public function getPrototype(string $name)
@@ -536,6 +539,13 @@ class Container implements ContainerInterface
      */
     public function destroyRequest(int $id): void
     {
+        $objects = $this->requestPool[$id] ?? [];
+        foreach ($objects as $object) {
+            if (method_exists($object, self::DESTROY_METHOD)) {
+                $object->{self::DESTROY_METHOD}();
+            }
+        }
+
         unset($this->requestPool[$id]);
     }
 

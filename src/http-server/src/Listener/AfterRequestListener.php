@@ -4,6 +4,8 @@
 namespace Swoft\Http\Server\Listener;
 
 
+use Swoft\Bean\BeanEvent;
+use Swoft\Co;
 use Swoft\Context\Context;
 use Swoft\Event\Annotation\Mapping\Listener;
 use Swoft\Event\EventHandlerInterface;
@@ -12,6 +14,7 @@ use Swoft\Http\Message\Response;
 use Swoft\Http\Server\HttpServerEvent;
 use Swoft\Log\Logger;
 use Swoft\Event\Listener\ListenerPriority;
+use Swoft\SwoftEvent;
 
 /**
  * Class AfterRequestListener
@@ -35,15 +38,6 @@ class AfterRequestListener implements EventHandlerInterface
         $response = $event->getParam(0);
         $response->send();
 
-        /* @var Logger $logger */
-        $logger = \bean('logger');
-
-        // Add notice log
-        if ($logger->isEnable()) {
-            $logger->appendNoticeLog();
-        }
-
-        // Destroy context
-        Context::destroy();
+        \Swoft::trigger(SwoftEvent::COROUTINE_DESTROY);
     }
 }

@@ -3,6 +3,7 @@
 
 namespace Swoft\Db;
 
+use Swoft\Bean\BeanFactory;
 use Swoft\Context\Context;
 use Swoft\Db\Exception\PoolException;
 use Swoft\Db\Exception\QueryException;
@@ -59,9 +60,9 @@ class DB
             }
 
             $con = $pool->getConnection();
-            $cm  = self::getConnectionManager();
-            $cm->setConnection($con);
-
+//            $cm  = self::getConnectionManager();
+//            $cm->setConnection($con);
+            
             return $con;
         } catch (\Throwable $e) {
             throw new PoolException(
@@ -89,9 +90,6 @@ class DB
         }
 
         $connection = self::pool();
-        $cm         = self::getConnectionManager();
-
-        $cm->setConnection($connection);
         return $connection->$name(...$arguments);
     }
 
@@ -104,6 +102,6 @@ class DB
      */
     private static function getConnectionManager(): ConnectionManager
     {
-        return Context::getRequestBean(ConnectionManager::class);
+        return BeanFactory::getBean(ConnectionManager::class);
     }
 }

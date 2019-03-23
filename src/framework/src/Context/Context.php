@@ -71,7 +71,7 @@ class Context
 
     /**
      * Get request bean
-     * 
+     *
      * @param string $name
      *
      * @return mixed|object
@@ -82,6 +82,19 @@ class Context
     {
         $tid = Co::tid();
         return BeanFactory::getRequestBean($name, $tid);
+    }
+
+    /**
+     * Get context wait group
+     *
+     * @return ContextWaitGroup
+     *
+     * @throws \ReflectionException
+     * @throws \Swoft\Bean\Exception\ContainerException
+     */
+    public static function getContextWaitGroup()
+    {
+        return BeanFactory::getBean(ContextWaitGroup::class);
     }
 
     /**

@@ -2,6 +2,8 @@
 
 namespace Swoft;
 
+use Swoft\Context\Context;
+use Swoft\Context\ContextWaitGroup;
 use Swoft\Stdlib\Helper\PhpHelper;
 use Swoole\Coroutine;
 
@@ -52,22 +54,34 @@ class Co
      * Create coroutine
      *
      * @param callable $callable
+     * @param bool     $wait
      *
      * @return int If success, return coID
      */
-    public static function create(callable $callable): int
+    public static function create(callable $callable, bool $wait = true): int
     {
         $tid = self::tid();
 
         // return coroutine ID for created.
-        return \go(function () use ($callable, $tid) {
+        return \go(function () use ($callable, $tid, $wait) {
             try {
                 $id = Coroutine::getCid();
 
                 self::$mapping[$id] = $tid;
+
+                // Add task to wait group
+                if($wait){
+                    Context::getContextWaitGroup()->add();
+                }
+
                 PhpHelper::call($callable);
             } catch (\Throwable $e) {
-                var_dump($e->getMessage(), ' file='.$e->getFile().' line='.$e->getLine());
+                var_dump($e->getMessage(), ' file=' . $e->getFile() . ' line=' . $e->getLine());
+            }
+
+            // Done task
+            if($wait){
+                Context::getContextWaitGroup()->done();
             }
         });
     }

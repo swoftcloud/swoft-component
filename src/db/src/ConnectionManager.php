@@ -13,7 +13,7 @@ use Swoft\Connection\Pool\ConnectionInterface as BaseConnection;
  *
  * @since 2.0
  *
- * @Bean(scope=Bean::REQUEST)
+ * @Bean()
  */
 class ConnectionManager
 {
@@ -30,15 +30,30 @@ class ConnectionManager
     /**
      * @example
      * [
-     *   'transaction' =>[
-     *      'cid' => [
-     *          'transactions' => 0,
-     *          'connection' => Connection
+     *  'tid' => [
+     *      'transaction' => [
+     *          'cid' => [
+     *              'transactions' => 0,
+     *              'connection' => Connection
+     *          ]
+     *      ],
+     *
+     *     'connection' => [
+     *          'connectionId' => Connection
      *      ]
-     *   ]
-     *  'connection' =>[
-     *      'connectionId' => Connection
-     *  ]
+     *   ],
+     *  'tid2' => [
+     *      'transaction' => [
+     *          'cid' => [
+     *              'transactions' => 0,
+     *              'connection' => Connection
+     *          ]
+     *      ],
+     *
+     *     'connection' => [
+     *          'connectionId' => Connection
+     *      ]
+     *   ],
      * ]
      */
     use DataPropertyTrait;
@@ -57,14 +72,6 @@ class ConnectionManager
     public function setTransactionConnection(Connection $connection): void
     {
         $this->set($this->getTckey(), $connection);
-    }
-
-    /**
-     * @param int $transactions
-     */
-    public function setTransactions(int $transactions): void
-    {
-        $this->set($this->getTtKey(), $transactions);
     }
 
     /**
@@ -107,6 +114,14 @@ class ConnectionManager
     }
 
     /**
+     * @param int $transactions
+     */
+    public function setTransactions(int $transactions): void
+    {
+        $this->set($this->getTtKey(), $transactions);
+    }
+
+    /**
      * @return int
      */
     public function getTransactions(): int
@@ -121,8 +136,9 @@ class ConnectionManager
      */
     public function releaseTransaction(int $connectionId)
     {
+        $tid  = Co::tid();
         $cid  = Co::id();
-        $tKey = sprintf('%s.%d', self::TRANSACTION_KEY, $cid);
+        $tKey = sprintf('%d.%s.%d', $tid, self::TRANSACTION_KEY, $cid);
         $this->unset($tKey);
 
         $this->releaseConnection($connectionId);
@@ -133,7 +149,8 @@ class ConnectionManager
      */
     public function releaseConnection(int $id)
     {
-        $cKey = sprintf('%s.%d', self::CONNECTION_KEY, $id);
+        $tid  = Co::tid();
+        $cKey = sprintf('%d.%s.%d', $tid, self::CONNECTION_KEY, $id);
         $this->unset($cKey);
     }
 
@@ -143,27 +160,31 @@ class ConnectionManager
      * @throws \ReflectionException
      * @throws \Swoft\Bean\Exception\ContainerException
      */
-    public function __destroy()
+    public function destroy()
     {
-        $transactions = $this->get(self::TRANSACTION_KEY);
-        $connections  = $this->get(self::CONNECTION_KEY);
-
-        // Destroy transaction
-        foreach ($transactions as $cid => $transaction) {
-            if (!empty($connection) && $connection instanceof Connection) {
-                $connection->release(true);
-            }
-        }
-
-        // Destroy connection
-        foreach ($connections as $connectionId => $cConnection) {
-            if (!empty($cConnection) && $cConnection instanceof Connection) {
-                $cConnection->release(true);
-            }
-        }
-
-        $this->unset(self::TRANSACTION_KEY);
-        $this->unset(self::CONNECTION_KEY);
+//        $tid   = Co::tid();
+//        $tkeys = sprintf('%d.%s', $tid, self::TRANSACTION_KEY);
+//        $ckeys = sprintf('%d.%s', $tid, self::CONNECTION_KEY);
+//
+//        $transactions = $this->get($tkeys, []);
+//        $connections  = $this->get($ckeys, []);
+//
+//        // Destroy transaction
+//        foreach ($transactions as $cid => $connection) {
+//            $connection = $connection['connection'] ?? null;
+//            if (!empty($connection) && $connection instanceof Connection) {
+//                $connection->forceRollback();
+//            }
+//        }
+//
+//        // Destroy connection
+//        foreach ($connections as $connectionId => $cConnection) {
+//            if (!empty($cConnection) && $cConnection instanceof Connection) {
+//                $cConnection->release(true);
+//            }
+//        }
+//
+//        $this->unset((string)$tid);
     }
 
     /**
@@ -175,7 +196,8 @@ class ConnectionManager
      */
     private function getCkey(int $id): string
     {
-        return sprintf('%s.%d', self::CONNECTION_KEY, $id);
+        $tid = Co::tid();
+        return sprintf('%d.%s.%d', $tid, self::CONNECTION_KEY, $id);
     }
 
     /**
@@ -183,8 +205,9 @@ class ConnectionManager
      */
     private function getTtKey(): string
     {
+        $tid = Co::tid();
         $cid = Co::id();
-        return sprintf('%s.%d.transactions', self::TRANSACTION_KEY, $cid);
+        return sprintf('%d.%s.%d.transactions', $tid, self::TRANSACTION_KEY, $cid);
     }
 
     /**
@@ -193,7 +216,8 @@ class ConnectionManager
      */
     private function getTckey(): string
     {
+        $tid = Co::tid();
         $cid = Co::id();
-        return sprintf('%s.%d.connection', self::TRANSACTION_KEY, $cid);
+        return sprintf('%d.%s.%d.connection', $tid, self::TRANSACTION_KEY, $cid);
     }
 }

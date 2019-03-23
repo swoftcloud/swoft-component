@@ -4,7 +4,9 @@
 namespace Swoft\Db;
 
 
+use Swoft\Bean\BeanFactory;
 use Swoft\Bean\Exception\PrototypeException;
+use Swoft\Co;
 use Swoft\Connection\Pool\AbstractConnection;
 use Swoft\Context\Context;
 use Swoft\Db\Concern\Transaction;
@@ -705,9 +707,11 @@ class Connection extends AbstractConnection implements ConnectionInterface
      */
     public function getReadPdo(): \PDO
     {
-        $cm = $this->getConnectionManager();
+//        $cm = $this->getConnectionManager();
+
         // transaction
-        if ($cm->isTransaction()) {
+//        if ($cm->isTransaction()) {
+        if (true) {
             return $this->getPdo();
         }
 
@@ -796,10 +800,10 @@ class Connection extends AbstractConnection implements ConnectionInterface
 
             // Release connection
             $this->release(true);
+        }else{
+            // Dec transaction
+            $cm->DecTransactions();
         }
-
-        // Dec transaction
-        $cm->DecTransactions();
 
         \Swoft::trigger(DbEvent::COMMIT_TRANSACTION);
     }
@@ -833,6 +837,21 @@ class Connection extends AbstractConnection implements ConnectionInterface
 
         $cm->setTransactions($toLevel);
         \Swoft::trigger(DbEvent::ROLLBACK_TRANSACTION);
+    }
+
+    /**
+     * Force rollback
+     *
+     * @throws \ReflectionException
+     * @throws \Swoft\Bean\Exception\ContainerException
+     */
+    public function forceRollback(): void
+    {
+        // Rollback
+        $this->getPdo()->rollBack();
+
+        // Release connection
+        $this->release(true);
     }
 
     /**
@@ -876,16 +895,18 @@ class Connection extends AbstractConnection implements ConnectionInterface
      */
     public function release(bool $force = false): void
     {
-        $cm = $this->getConnectionManager();
+//        $cm = $this->getConnectionManager();
+//
+//        // Not transaction
+//        if ($force || !$cm->isTransaction()) {
+//            // Release from connection manager
+//            $cm->releaseConnection($this->id);
+//
+//            // Release connection
+//            parent::release();
+//        }
 
-        // Not transaction
-        if ($force || !$cm->isTransaction()) {
-            // Release from connection manager
-            $cm->releaseConnection($this->id);
-
-            // Release connection
-            parent::release();
-        }
+        parent::release();
     }
 
     /**
@@ -940,7 +961,7 @@ class Connection extends AbstractConnection implements ConnectionInterface
      */
     protected function getConnectionManager(): ConnectionManager
     {
-        return Context::getRequestBean(ConnectionManager::class);
+        return BeanFactory::getBean(ConnectionManager::class);
     }
 
     /**

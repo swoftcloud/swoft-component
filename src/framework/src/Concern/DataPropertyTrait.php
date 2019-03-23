@@ -63,7 +63,7 @@ trait DataPropertyTrait
      */
     public function unset(string $key): void
     {
-        unset($this->data[$key]);
+        ArrayHelper::forget($this->data, $key);
     }
 
     /**

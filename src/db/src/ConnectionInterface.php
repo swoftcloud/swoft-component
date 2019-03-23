@@ -168,6 +168,11 @@ interface ConnectionInterface
     public function rollBack(int $toLevel = null): void;
 
     /**
+     * Force rollback
+     */
+    public function forceRollback(): void;
+
+    /**
      * Get the number of active transactions.
      *
      * @return int

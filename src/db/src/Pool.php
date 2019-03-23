@@ -4,6 +4,7 @@
 namespace Swoft\Db;
 
 
+use Swoft\Bean\BeanFactory;
 use Swoft\Connection\Pool\AbstractPool;
 use Swoft\Connection\Pool\ConnectionInterface;
 use Swoft\Context\Context;
@@ -39,19 +40,21 @@ class Pool extends AbstractPool
      */
     public function getConnection(): ConnectionInterface
     {
-        /* @var ConnectionManager $cm */
-        $cm = Context::getRequestBean(ConnectionManager::class);
-        if (!$cm->isTransaction()) {
-            $connection = parent::getConnection();
-            $connection->setRelease(true);
-
-            return $connection;
-        }
-
-        $connection = $cm->getTransactionConnection();
-        if (empty($connection) || !$connection instanceof ConnectionInterface) {
-            throw new PoolException('Connection from connection manager is not exist!');
-        }
+//        /* @var ConnectionManager $cm */
+//        $cm = BeanFactory::getBean(ConnectionManager::class);
+//        if (!$cm->isTransaction()) {
+//            $connection = parent::getConnection();
+//            $connection->setRelease(true);
+//
+//            return $connection;
+//        }
+//
+//        $connection = $cm->getTransactionConnection();
+//        if (empty($connection) || !$connection instanceof ConnectionInterface) {
+//            throw new PoolException('Connection from connection manager is not exist!');
+//        }
+        $connection = parent::getConnection();
+        $connection->setRelease(true);
 
         return $connection;
     }

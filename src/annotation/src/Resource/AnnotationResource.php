@@ -98,6 +98,7 @@ class AnnotationResource extends Resource
         $prefixDirsPsr4 = $this->classLoader->getPrefixesPsr4();
 
         foreach ($prefixDirsPsr4 as $ns => $paths) {
+
             // It is excluded psr4 prefix
             if ($this->isExcludedPsr4Prefix($ns)) {
                 CLog::info('Exclude scan %s', $ns);
@@ -186,10 +187,8 @@ class AnnotationResource extends Resource
                 }
 
                 $suffix        = \sprintf('.%s', $this->loaderClassSuffix);
-                $classPathName = \str_replace([$path, '/'], ['', '\\'], $pathName);
-                $classPathName = \trim($classPathName, $suffix);
-
-                $className = \sprintf('%s%s', $ns, $classPathName);
+                $classPathName = \str_replace([$path, '/', $suffix], ['', '\\', ''], $pathName);
+                $className     = \sprintf('%s%s', $ns, $classPathName);
 
                 // Fix repeated load, such as `Swoft`
                 if (!\class_exists($className)) {
