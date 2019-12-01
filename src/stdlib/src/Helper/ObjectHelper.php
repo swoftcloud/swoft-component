@@ -134,6 +134,11 @@ class ObjectHelper
         if (preg_match('/@var\s+([^\s]+)/', $docComment, $matches)) {
             [, $type] = $matches;
 
+            // Fixed like 'Xxx[]'
+            if (strpos($type, '[]') !== false) {
+                return 'array';
+            }
+
             if (in_array($type, self::BASE_TYPES, true)) {
                 return $type;
             }
