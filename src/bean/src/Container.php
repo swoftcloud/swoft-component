@@ -390,24 +390,25 @@ class Container implements ContainerInterface
      *
      * When class name will return all of instance for class name
      *
-     * @return object
+     * @return object|mixed
      * @throws InvalidArgumentException
      */
     public function get($id)
     {
-        // It is singleton
+        // It is singleton bean
         if (isset($this->singletonPool[$id])) {
             return $this->singletonPool[$id];
         }
 
-        // Prototype by clone
+        // Prototype bean by clone
         if (isset($this->prototypePool[$id])) {
             return clone $this->prototypePool[$id];
         }
 
-        // Alias name
+        // Has alias name
         $aliasId = $this->aliases[$id] ?? '';
-        if ($aliasId) {
+        // Fix: $aliasId !== $id deny loop get
+        if ($aliasId && $aliasId !== $id) {
             return $this->get($aliasId);
         }
 
@@ -432,7 +433,7 @@ class Container implements ContainerInterface
         /* @var ObjectDefinition $objectDefinition */
         $objectDefinition = $this->objectDefinitions[$id];
 
-        // Prototype
+        // Prototype bean
         return $this->safeNewBean($objectDefinition->getName());
     }
 
@@ -532,7 +533,7 @@ class Container implements ContainerInterface
             ];
         }
 
-        $definitionObjParser = new DefinitionObjParser([$name=>$definition], [], [], $this->aliases);
+        $definitionObjParser = new DefinitionObjParser([$name => $definition], [], [], $this->aliases);
         [, $objectDefinitions] = $definitionObjParser->parseDefinitions();
 
         $this->objectDefinitions[$name] = $objectDefinitions[$name];
@@ -648,9 +649,8 @@ class Container implements ContainerInterface
      */
     private function parseAnnotations(): void
     {
-        $annotationParser = new AnnotationObjParser(
-            $this->definitions, $this->objectDefinitions, $this->classNames, $this->aliases
-        );
+        $annotationParser = new AnnotationObjParser($this->definitions, $this->objectDefinitions, $this->classNames,
+            $this->aliases);
         $annotationData   = $annotationParser->parseAnnotations($this->annotations, $this->parsers);
 
         [$this->definitions, $this->objectDefinitions, $this->classNames, $this->aliases] = $annotationData;
@@ -661,9 +661,8 @@ class Container implements ContainerInterface
      */
     private function parseDefinitions(): void
     {
-        $annotationParser = new DefinitionObjParser(
-            $this->definitions, $this->objectDefinitions, $this->classNames, $this->aliases
-        );
+        $annotationParser = new DefinitionObjParser($this->definitions, $this->objectDefinitions, $this->classNames,
+            $this->aliases);
 
         // Collect info
         $definitionData = $annotationParser->parseDefinitions();
@@ -922,8 +921,8 @@ class Container implements ContainerInterface
         // Inject properties values
         $this->newProperty($reflectObject, $reflectionClass, $propertyInjects, $id);
 
-        // Alias
-        if (!empty($alias)) {
+        // Alias name
+        if ($alias && $alias !== $beanName) {
             $this->aliases[$alias] = $beanName;
         }
 
